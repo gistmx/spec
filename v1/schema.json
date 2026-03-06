@@ -1,0 +1,193 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gist.mx/spec/v1/schema.json",
+  "title": "MX Frontmatter Schema",
+  "description": "JSON Schema for validating .mx file YAML frontmatter (version 1.0)",
+  "type": "object",
+  "required": [
+    "mx_version",
+    "generated",
+    "source_hash",
+    "model",
+    "oneliner",
+    "gist",
+    "eli5"
+  ],
+  "properties": {
+    "mx_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+$",
+      "description": "Specification version (e.g., '1.0')"
+    },
+    "generated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 generation timestamp"
+    },
+    "source": {
+      "type": "string",
+      "description": "Original filename or URL"
+    },
+    "source_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "SHA-256 hash of the source markdown body"
+    },
+    "model": {
+      "type": "string",
+      "description": "AI model identifier used for generation"
+    },
+    "language": {
+      "type": "string",
+      "pattern": "^[a-z]{2,3}(-[A-Z][a-zA-Z]{1,7})?(-[A-Z]{2})?$",
+      "description": "BCP 47 language tag"
+    },
+    "oneliner": {
+      "type": "string",
+      "maxLength": 280,
+      "description": "Single-sentence summary, max 280 characters"
+    },
+    "gist": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "3-5 sentence summary"
+    },
+    "voice_brief": {
+      "type": "object",
+      "required": ["script"],
+      "properties": {
+        "script": {
+          "type": "string",
+          "maxLength": 3000,
+          "description": "250-350 word conversational script for spoken delivery"
+        },
+        "duration_seconds": {
+          "type": "integer",
+          "minimum": 60,
+          "maximum": 180,
+          "description": "Estimated audio duration in seconds"
+        },
+        "word_count": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Word count of the script"
+        },
+        "audio_hash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$",
+          "description": "SHA-256 hash of the associated audio file"
+        }
+      },
+      "additionalProperties": false
+    },
+    "eli5": {
+      "type": "string",
+      "maxLength": 1500,
+      "description": "Simplified explanation for a 5-year-old audience"
+    },
+    "manually_edited": {
+      "type": "boolean",
+      "default": false,
+      "description": "True if any layer has been human-edited"
+    },
+    "edit_history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["layer", "action"],
+        "properties": {
+          "layer": {
+            "type": "string",
+            "enum": ["oneliner", "gist", "voice_brief", "eli5"]
+          },
+          "action": {
+            "type": "string",
+            "enum": ["manual_edit", "regenerate"]
+          },
+          "instruction": {
+            "type": "string",
+            "description": "User instruction for regeneration"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "previous_hash": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "guidance": {
+      "type": "object",
+      "properties": {
+        "author": { "type": "string" },
+        "audience": { "type": "string" },
+        "key_takeaway": { "type": "string" },
+        "tone": { "type": "string" },
+        "emphasis": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "skip": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "highlights": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["section", "note"],
+            "properties": {
+              "section": { "type": "string" },
+              "note": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "lens_template": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "type": {
+      "type": "string",
+      "enum": ["project"],
+      "description": "Set to 'project' for multi-file MX"
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "oneliner", "hash"],
+        "properties": {
+          "path": { "type": "string" },
+          "oneliner": { "type": "string" },
+          "hash": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "relationships": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["from", "to", "type"],
+        "properties": {
+          "from": { "type": "string" },
+          "to": { "type": "string" },
+          "type": {
+            "type": "string",
+            "enum": ["references", "extends", "contradicts"]
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": true
+}

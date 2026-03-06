@@ -1,0 +1,101 @@
+---
+mx_version: "1.0"
+generated: "2026-03-05T12:00:00Z"
+source: "SKILL.md"
+source_hash: "sha256:a1b2c3d4e5f67890a1b2c3d4e5f67890a1b2c3d4e5f67890a1b2c3d4e5f67890"
+model: "qwen3-8b-instruct"
+language: "en"
+
+oneliner: >
+  A best-practices guide for building production React applications on Vercel with App Router, server components, and edge-first architecture.
+
+gist: >
+  This skill teaches AI agents how to build high-quality React applications
+  using Vercel's recommended patterns. It covers server and client component
+  architecture, data fetching with server actions, caching strategies, image
+  and font optimization, and deployment configuration. The emphasis is on
+  App Router patterns, edge-first rendering, and avoiding common pitfalls
+  that lead to performance regressions in production.
+
+voice_brief:
+  script: >
+    So if you're building a React app on Vercel, there are some patterns
+    that make a huge difference in production. The biggest shift is thinking
+    server-first. Most of your components should be server components by
+    default, which means they render on the server and send zero JavaScript
+    to the browser. You only add the "use client" directive when you actually
+    need interactivity, like click handlers or state. This alone can cut
+    your bundle size dramatically. For data, you want to use server actions
+    instead of building API routes for everything. They let you write
+    functions that run on the server but call them from your components
+    like regular functions. Caching is the other big one. Vercel gives you
+    a multi-layer cache, from request deduplication all the way to edge
+    caching, and understanding when to use each layer is what separates
+    a fast app from a slow one. The skill also covers image optimization
+    with next/image, font loading with next/font, and how to structure
+    your route segments so the framework can do its job efficiently.
+    Basically, it's the difference between writing React that happens
+    to run on Vercel and writing React that takes full advantage of
+    the platform.
+  duration_seconds: 118
+  word_count: 196
+
+eli5: >
+  Imagine you're building a house out of LEGO. Some pieces are really
+  heavy, like big castle walls. You don't want to carry all the heavy
+  pieces to the front door every time someone visits, right? So instead,
+  you build the heavy parts right where the house is, and only bring
+  the small fun pieces, like doors that open and close, to the front.
+  That's what this guide teaches robots to do when building websites.
+  Keep the heavy work in the back, and only send the fun clicky parts
+  to the person looking at the website. It also teaches the robot to
+  remember things it already figured out so it doesn't have to think
+  about the same thing twice. Pretty smart, right?
+
+manually_edited: false
+---
+
+# Vercel React Best Practices
+
+## Server Components First
+
+Use server components as the default. Only add `"use client"` when you need browser APIs, event handlers, or React state.
+
+```tsx
+// Server component (default) — no directive needed
+export default async function Dashboard() {
+  const data = await fetchMetrics();
+  return <MetricsGrid data={data} />;
+}
+```
+
+## Server Actions for Data Mutations
+
+Replace API routes with server actions for form submissions and data mutations.
+
+```tsx
+"use server";
+
+export async function createProject(formData: FormData) {
+  const name = formData.get("name");
+  await db.projects.create({ name });
+  revalidatePath("/projects");
+}
+```
+
+## Caching Strategy
+
+Understand the four cache layers:
+
+1. **Request deduplication** — Identical fetch calls in a single render are automatically deduped.
+2. **Data cache** — Server-side fetch results are cached across requests.
+3. **Full route cache** — Static routes are pre-rendered and cached at the edge.
+4. **Router cache** — Client-side cache for previously visited routes.
+
+## Image Optimization
+
+Always use `next/image` for automatic format conversion, resizing, and lazy loading.
+
+## Font Loading
+
+Use `next/font` to self-host fonts with zero layout shift.
