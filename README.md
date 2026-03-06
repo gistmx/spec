@@ -66,9 +66,6 @@ Everything below the frontmatter is the original document, unchanged.
 │   └── schema.json        ← JSON Schema for frontmatter validation
 ├── examples/
 │   └── vercel-react-best-practices.mx
-├── website/               ← Static site for gist.mx (deploy to Vercel)
-│   ├── index.html
-│   └── vercel.json
 └── docs/
     ├── gist_mx_technical_spec_v3.md
     └── iana_media_type_registration.md
