@@ -1,0 +1,91 @@
+---
+mx_version: "1.1"
+generated: "2026-03-16T14:30:00Z"
+source: "SKILL.md"
+source_hash: "sha256:a1b2c3d4e5f67890a1b2c3d4e5f67890a1b2c3d4e5f67890a1b2c3d4e5f67890"
+model: "qwen3-8b-instruct"
+language: "en"
+
+oneliner: >
+  A practical guide for building high-performance React apps on Vercel
+  using server-first architecture, modern caching, and production-safe
+  defaults.
+
+gist: >
+  This guide teaches implementation patterns for production React apps on
+  Vercel, with an emphasis on server components, server actions, and cache
+  strategy. It explains when interactivity should move to client components
+  and how to keep most rendering server-side for lower bundle cost. It also
+  covers image and font optimization, route segment structure, and common
+  deployment mistakes that hurt performance.
+
+voice_brief:
+  script: >
+    When you're building React on Vercel, the biggest unlock is thinking
+    server-first instead of client-first. Start with server components as
+    the default and only opt into client components where you actually need
+    browser-side state or event handlers. That one decision keeps your
+    JavaScript payload smaller and your pages faster. For writes and form
+    submissions, use server actions so your mutation logic stays close to
+    your rendering flow instead of spreading across many API routes.
+    Caching is the next lever: you get request deduplication during render,
+    persistent data cache behavior, and route-level caching choices that can
+    massively improve response time. On top of that, use next/image and
+    next/font so media and typography stay fast without layout shift. The
+    point of these patterns is to make performance the default, not an
+    afterthought, while keeping the codebase easier for teams to evolve.
+  duration_seconds: 45
+  word_count: 174
+
+eli5: >
+  Imagine you're making a toy city. Big buildings are heavy, so you build
+  them at the workshop and only carry tiny moving parts, like doors and
+  buttons, to your play table. Websites can work the same way. This guide
+  helps you do heavy work on the server and send only the fun interactive
+  pieces to people using the app. It also teaches your app to remember
+  answers it already found so it does less repeated work and feels faster.
+
+signature:
+  type: "jws"
+  alg: "EdDSA"
+  kid: "did:web:gist.mx#mx-signing-key-1"
+  issuer: "https://gist.mx"
+  issued_at: "2026-03-16T14:30:01Z"
+  claims_version: "mxsig-1"
+  jws: "eyJhbGciOiJFZERTQSJ9.eyJteF92ZXJzaW9uIjoiMS4xIiwic291cmNlX2hhc2giOiJzaGEyNTY6YTFiMmMzZDRlNWY2Nzg5MGE...signature"
+
+manually_edited: false
+edit_history: []
+---
+
+# Vercel React Best Practices (v1.1 Example)
+
+## Server Components First
+
+Use server components as the default. Add `"use client"` only when browser APIs, event handlers, or local React state are required.
+
+```tsx
+// Server component (default)
+export default async function Dashboard() {
+  const data = await fetchMetrics();
+  return <MetricsGrid data={data} />;
+}
+```
+
+## Server Actions for Mutations
+
+Use server actions for writes so mutation logic stays on the server and close to route behavior.
+
+```tsx
+"use server";
+
+export async function createProject(formData: FormData) {
+  const name = formData.get("name");
+  await db.projects.create({ name });
+  revalidatePath("/projects");
+}
+```
+
+## Caching Strategy
+
+Design intentionally around request deduplication, data caching, and route-level cache behavior so rendering work is reused whenever possible.

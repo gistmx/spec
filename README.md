@@ -1,14 +1,14 @@
 # .mx Format Specification
 
-The **Markdown Experience** (`.mx`) format extends standard markdown with structured AI-generated comprehension layers embedded in YAML frontmatter. It makes markdown documents accessible by providing multiple levels of understanding — from a single-sentence summary to a conversational voice brief — without breaking backward compatibility.
+The **Markdown Experience** (`.mx`) format extends standard markdown with structured AI-generated comprehension layers embedded in YAML frontmatter. It makes markdown documents accessible by providing multiple levels of understanding — from a single-sentence summary to a conversational voice brief — without breaking backward compatibility. Version 1.1 adds cryptographic signature metadata for provenance workflows.
 
 ## Quick Overview
 
-An `.mx` file is a valid markdown file. Any tool that reads `.md` can read `.mx`. The comprehension layers live in YAML frontmatter and are invisible to unaware renderers.
+An `.mx` file is a valid markdown file. Any tool that reads `.md` can read `.mx`. The comprehension layers live in YAML frontmatter and are invisible to unaware renderers. The example below shows the current v1.1 shape.
 
 ```yaml
 ---
-mx_version: "1.0"
+mx_version: "1.1"
 generated: "2026-03-05T12:00:00Z"
 source: "README.md"
 source_hash: "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
@@ -32,6 +32,15 @@ voice_brief:
 eli5: >
   The whole thing explained like you're talking to a curious five-year-old.
   Simple words, fun analogies, ends with a question.
+
+signature:
+  type: "jws"
+  alg: "EdDSA"
+  kid: "did:web:gist.mx#mx-signing-key-1"
+  issuer: "https://gist.mx"
+  issued_at: "2026-03-05T12:00:01Z"
+  claims_version: "mxsig-1"
+  jws: "eyJhbGciOiJFZERTQSJ9.<payload>.<signature>"
 ---
 
 # Original Markdown Content
@@ -54,6 +63,7 @@ Everything below the frontmatter is the original document, unchanged.
 - **Backward compatible.** Valid markdown. Opens in any editor.
 - **Source-linked.** SHA-256 hash verifies the layers match the content.
 - **Model-stamped.** The AI model is recorded for reproducibility.
+- **Signed provenance.** Version 1.1 supports JWS signature metadata via the `signature` object.
 - **Human-editable.** A `manually_edited` flag indicates human refinement.
 
 ## Repository Structure
@@ -64,17 +74,20 @@ Everything below the frontmatter is the original document, unchanged.
 ├── v1/
 │   ├── spec.md            ← Format specification (v1.0)
 │   └── schema.json        ← JSON Schema for frontmatter validation
+├── v1.1/
+│   ├── spec.md            ← Format specification (v1.1)
+│   └── schema.json        ← JSON Schema for frontmatter validation
 ├── examples/
-│   └── vercel-react-best-practices.mx
-└── docs/
-    ├── gist_mx_technical_spec_v3.md
-    └── iana_media_type_registration.md
+│   ├── vercel-react-best-practices.mx
+│   └── vercel-react-best-practices-v1.1.mx
 ```
 
 ## Specification
 
-- [Format Specification (v1.0)](./v1/spec.md) — Full format definition
-- [JSON Schema](./v1/schema.json) — Machine-readable frontmatter schema
+- [Format Specification (v1.1)](./v1.1/spec.md) — Current format definition
+- [JSON Schema (v1.1)](./v1.1/schema.json) — Current machine-readable frontmatter schema
+- [Format Specification (v1.0)](./v1/spec.md) — Legacy version for compatibility
+- [JSON Schema (v1.0)](./v1/schema.json) — Legacy machine-readable frontmatter schema
 - [Examples](./examples/) — Sample `.mx` files
 
 ## MIME Type

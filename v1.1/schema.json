@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/gistmx/spec/blob/main/v1.1/schema.json",
+  "title": "gist.mx Frontmatter v1.1",
+  "description": "JSON Schema for .mx YAML frontmatter, version 1.1 with JWS signature metadata.",
+  "type": "object",
+  "required": [
+    "mx_version",
+    "generated",
+    "source",
+    "source_hash",
+    "model",
+    "oneliner",
+    "gist",
+    "voice_brief",
+    "eli5",
+    "signature"
+  ],
+  "properties": {
+    "mx_version": {
+      "const": "1.1"
+    },
+    "generated": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source": {
+      "type": "string"
+    },
+    "source_hash": {
+      "type": "string"
+    },
+    "model": {
+      "type": "string"
+    },
+    "language": {
+      "type": "string",
+      "default": "en"
+    },
+    "oneliner": {
+      "type": "string"
+    },
+    "gist": {
+      "type": "string"
+    },
+    "voice_brief": {
+      "$ref": "#/$defs/voiceBrief"
+    },
+    "eli5": {
+      "type": "string"
+    },
+    "manually_edited": {
+      "type": "boolean",
+      "default": false
+    },
+    "edit_history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "default": []
+    },
+    "guidance": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "signature": {
+      "$ref": "#/$defs/signature"
+    }
+  },
+  "$defs": {
+    "voiceBrief": {
+      "type": "object",
+      "required": [
+        "script",
+        "duration_seconds",
+        "word_count"
+      ],
+      "properties": {
+        "script": {
+          "type": "string"
+        },
+        "duration_seconds": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "word_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "audio_hash": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "signature": {
+      "type": "object",
+      "required": [
+        "type",
+        "alg",
+        "kid",
+        "issuer",
+        "issued_at",
+        "claims_version",
+        "jws"
+      ],
+      "properties": {
+        "type": {
+          "const": "jws"
+        },
+        "alg": {
+          "const": "EdDSA"
+        },
+        "kid": {
+          "type": "string",
+          "minLength": 1
+        },
+        "issuer": {
+          "type": "string",
+          "format": "uri"
+        },
+        "issued_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "claims_version": {
+          "const": "mxsig-1"
+        },
+        "jws": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": true
+}
