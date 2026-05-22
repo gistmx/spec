@@ -1,0 +1,188 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gist.mx/spec/v1.2/schema.json",
+  "title": "MX Frontmatter Schema v1.2",
+  "description": "JSON Schema for validating .mx file YAML frontmatter (version 1.2). Core field values are natural language prose, ISO timestamps, BCP 47 tags, or SHA-256 hash scalars. Application-specific extensions use the x_ prefix and are not validated here.",
+  "type": "object",
+  "required": [
+    "mx_version",
+    "generated",
+    "source_hash",
+    "mx_hash",
+    "model",
+    "oneliner",
+    "gist",
+    "eli5"
+  ],
+  "properties": {
+    "mx_version": {
+      "type": "string",
+      "const": "1.2",
+      "description": "Must be exactly '1.2' for this version."
+    },
+    "generated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "RFC 3339 / ISO 8601 date-time of generation."
+    },
+    "source": {
+      "type": "string",
+      "description": "Source filename, path, or URL. Optional."
+    },
+    "source_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "SHA-256 hash of the source markdown body. Format: sha256:<64 lowercase hex chars>"
+    },
+    "mx_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "SHA-256 hash of comprehension layer content + generation metadata. Used for offline tamper detection. See spec section 4.2 for exact computation."
+    },
+    "model": {
+      "type": "string",
+      "description": "AI model identifier used for generation (e.g., 'qwen3-8b-instruct')."
+    },
+    "language": {
+      "type": "string",
+      "pattern": "^[a-z]{2,3}(-[A-Z][a-zA-Z]{1,7})?(-[A-Z]{2})?$",
+      "default": "en",
+      "description": "BCP 47 language tag of the source content."
+    },
+    "oneliner": {
+      "type": "string",
+      "maxLength": 280,
+      "description": "Single-sentence summary. Maximum 280 characters."
+    },
+    "gist": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "3-5 sentence summary. No jargon. Maximum 1,000 characters."
+    },
+    "voice_brief": {
+      "type": "object",
+      "required": ["script"],
+      "properties": {
+        "script": {
+          "type": "string",
+          "maxLength": 3000,
+          "description": "Conversational script written for spoken delivery. 250-350 words recommended."
+        },
+        "duration_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Estimated audio duration in seconds."
+        },
+        "word_count": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Word count of the script."
+        },
+        "audio_hash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$",
+          "description": "SHA-256 hash of associated audio file. Content hash only — not a URL."
+        }
+      },
+      "additionalProperties": false
+    },
+    "eli5": {
+      "type": "string",
+      "maxLength": 1500,
+      "description": "Plain everyday vocabulary explanation. 100-200 words. Analogy-first."
+    },
+    "manually_edited": {
+      "type": "boolean",
+      "default": false,
+      "description": "True if any comprehension layer has been modified by a human after generation."
+    },
+    "edit_history": {
+      "type": "array",
+      "description": "Ordered list of edit events. Items are open objects.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "layer": {
+            "type": "string",
+            "enum": ["oneliner", "gist", "voice_brief", "eli5"]
+          },
+          "action": {
+            "type": "string",
+            "enum": ["manual_edit", "regenerate"]
+          },
+          "instruction": { "type": "string" },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "previous_hash": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "guidance": {
+      "type": "object",
+      "description": "Human-provided authoring guidance. Open object — additional fields allowed.",
+      "properties": {
+        "author": { "type": "string" },
+        "audience": { "type": "string" },
+        "key_takeaway": { "type": "string" },
+        "tone": { "type": "string" },
+        "emphasis": { "type": "array", "items": { "type": "string" } },
+        "skip": { "type": "array", "items": { "type": "string" } },
+        "highlights": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["section", "note"],
+            "properties": {
+              "section": { "type": "string" },
+              "note": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "lens_template": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "type": {
+      "type": "string",
+      "const": "project",
+      "description": "Set to 'project' for multi-file project MX."
+    },
+    "files": {
+      "type": "array",
+      "description": "Constituent files in a project MX.",
+      "items": {
+        "type": "object",
+        "required": ["path", "oneliner", "hash"],
+        "properties": {
+          "path": { "type": "string" },
+          "oneliner": { "type": "string" },
+          "hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "relationships": {
+      "type": "array",
+      "description": "Cross-file relationships in a project MX.",
+      "items": {
+        "type": "object",
+        "required": ["from", "to", "type"],
+        "properties": {
+          "from": { "type": "string" },
+          "to": { "type": "string" },
+          "type": {
+            "type": "string",
+            "enum": ["references", "extends", "contradicts"]
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": true,
+  "$comment": "additionalProperties is true to allow x_ prefixed extension fields (e.g., x_gistmx_sig for application-layer cryptographic signing). Extension fields are out of scope for this specification and must be ignored by conforming consumers that do not understand them."
+}
